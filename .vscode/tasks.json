@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Собрать проект",
+            "type": "shell",
+            "command": "arduino-cli compile --fqbn esp32:esp32:esp32doit-devkit-v1 SmartBoiler_JSON_v4.ino",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Компиляция прошивки для ESP32"
+        },
+        {
+            "label": "Загрузить в ESP32",
+            "type": "shell",
+            "command": "arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32doit-devkit-v1 SmartBoiler_JSON_v4.ino",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Прошивка ESP32 через USB"
+        },
+        {
+            "label": "Serial Monitor",
+            "type": "shell",
+            "command": "arduino-cli monitor -p /dev/ttyUSB0 -b 115200",
+            "problemMatcher": [],
+            "detail": "Открыть Serial Monitor (115200)"
+        },
+        {
+            "label": "Загрузить SPIFFS",
+            "type": "shell",
+            "command": "pio run --target uploadfs",
+            "problemMatcher": [],
+            "detail": "Загрузить файлы в SPIFFS/LittleFS"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+# Arduino / ESP32
+build/
+.cache/
+*.o
+*.d
+*.elf
+*.bin
+*.map
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets - NEVER commit real tokens!
+config.h
+
+# LittleFS data (optional - can be committed if no secrets)
+# data/
+
+# ACPX sessions (personal, not shared)
+.qwen/

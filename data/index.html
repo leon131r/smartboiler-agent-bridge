@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Умный Котёл v4.2</title>
+    <!-- Локальные стили вместо CDN для автономной работы -->
+    <style>
+        /* Минимальные иконки-заглушки если FontAwesome не загрузился */
+        .fas::before { content: "●"; margin-right: 4px; }
+        .fa-fire::before { content: "🔥"; }
+        .fa-thermometer-half::before { content: "🌡"; }
+        .fa-cogs::before { content: "⚙"; }
+        .fa-shield-alt::before { content: "🛡"; }
+        .fa-bolt::before { content: "⚡"; }
+        .fa-chart-line::before { content: "📈"; }
+        .fa-wifi::before { content: "📶"; }
+        .fa-network-wired::before { content: "🌐"; }
+        .fa-clock::before { content: "⏱"; }
+        .fa-exclamation-triangle::before { content: "⚠"; }
+        .fa-power-off::before { content: "⏻"; }
+        .fa-check-circle::before { content: "✅"; }
+        .fa-arrow-up::before { content: "↑"; }
+        .fa-arrow-down::before { content: "↓"; }
+        .fa-redo::before { content: "🔄"; }
+        .fa-sync::before { content: "🔃"; }
+        .fa-sync-alt::before { content: "🔄"; }
+        .fa-robot::before { content: "🤖"; }
+        .fa-stop::before { content: "⏹"; }
+        .fa-hand-paper::before { content: "✋"; }
+        .fa-expand-alt::before { content: "⬜"; }
+        .fa-compress-alt::before { content: "⬛"; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"
+          onload="this.onload=null;document.querySelectorAll('.fas').forEach(e=>e.classList.remove('fa-fallback'))"
+          onerror="console.warn('Font Awesome CDN недоступен, используются заглушки')">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <header class="header">
+            <div class="header-title">
+                <h1><i class="fas fa-fire"></i> Умный Котёл v4.2</h1>
+            </div>
+            <div class="header-info">
+                <div class="info-item" id="connectionStatus">
+                    <span class="status-dot online"></span>
+                    <span>Онлайн</span>
+                </div>
+                <div class="info-item" id="ipItem">
+                    <i class="fas fa-network-wired"></i>
+                    <span id="ipText">---</span>
+                </div>
+                <div class="info-item" id="uptimeItem">
+                    <i class="fas fa-clock"></i>
+                    <span id="uptime">00:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Вода -->
+        <div class="water-alert" id="waterAlert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Низкий уровень воды!</span>
+        </div>
+
+        <!-- Основные параметры -->
+        <div class="dashboard">
+            <!-- Температуры -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-thermometer-half"></i> Температуры</h3>
+                </div>
+                <div class="card-body">
+                    <div class="temp-grid">
+                        <div class="temp-item">
+                            <div class="temp-label">ОБРАТКА</div>
+                            <div class="temp-value" id="tempReturn">--.-°C</div>
+                            <div class="temp-trend">
+                                <i class="fas fa-arrow-up trend-up"></i>
+                            </div>
+                        </div>
+                        <div class="temp-item">
+                            <div class="temp-label">ПОДАЧА</div>
+                            <div class="temp-value" id="tempFlow">--.-°C</div>
+                            <div class="temp-trend">
+                                <i class="fas fa-arrow-down trend-down"></i>
+                            </div>
+                        </div>
+                        <div class="temp-item">
+                            <div class="temp-label">ВОЗДУХ</div>
+                            <div class="temp-value" id="tempAir">--.-°C</div>
+                        </div>
+                        <div class="temp-item">
+                            <div class="temp-label">ΔT</div>
+                            <div class="temp-value" id="tempDelta">--.-°C</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Управление -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cogs"></i> Управление</h3>
+                    <div class="mode-badge" id="modeBadge" style="background: #e74c3c;">Выключен</div>
+                </div>
+                <div class="card-body">
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-label">Цель</div>
+                            <div class="control-value" id="targetTemp">45°C</div>
+                            <div class="control-buttons">
+                                <button class="btn-sm temp">35</button>
+                                <button class="btn-sm temp">40</button>
+                                <button class="btn-sm temp">45</button>
+                                <button class="btn-sm temp">50</button>
+                                <button class="btn-sm temp">55</button>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-label">Мощность</div>
+                            <div class="control-value" id="powerValue">0%</div>
+                            <div class="power-slider">
+                                <input type="range" min="0" max="100" value="0"
+                                       class="slider" id="powerSlider">
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-label">Максимум</div>
+                            <div class="control-value" id="maxTemp">75°C</div>
+                            <div class="control-buttons">
+                                <button class="btn-sm">65</button>
+                                <button class="btn-sm">70</button>
+                                <button class="btn-sm">75</button>
+                                <button class="btn-sm">80</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Реле и безопасность -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Состояние системы</h3>
+                </div>
+                <div class="card-body">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-icon" id="relayIcon">
+                                <i class="fas fa-power-off" style="color: #95a5a6"></i>
+                            </div>
+                            <div class="status-text">Реле: <span id="relayState" style="color: #e74c3c">ВЫКЛ</span></div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-icon" id="safetyIcon">
+                                <i class="fas fa-check-circle" style="color: #27ae60"></i>
+                            </div>
+                            <div class="status-text">Безопасность: <span id="safetyState" style="color: #27ae60">OK</span></div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-icon">
+                                <i class="fas fa-bolt" style="color: #f39c12"></i>
+                            </div>
+                            <div class="status-text">Потребление: <span id="consumption" style="color: #95a5a6">-- W</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрые команды -->
+            <div class="card quick-commands">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Быстрые команды</h3>
+                </div>
+                <div class="card-body">
+                    <div class="command-group">
+                        <h4>Режимы:</h4>
+                        <div class="button-row">
+                            <button class="btn btn-success" id="btnAuto">
+                                <i class="fas fa-robot"></i> Авто
+                            </button>
+                            <button class="btn btn-danger" id="btnOff">
+                                <i class="fas fa-stop"></i> Выключить
+                            </button>
+                            <button class="btn btn-warning" id="btnManual">
+                                <i class="fas fa-hand-paper"></i> Ручной
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button class="btn-sm temp">10°C</button>
+                        <button class="btn-sm temp">15°C</button>
+                        <button class="btn-sm temp">20°C</button>
+                        <button class="btn-sm temp">25°C</button>
+                        <button class="btn-sm temp">30°C</button>
+                        <button class="btn-sm temp">35°C</button>
+                        <button class="btn-sm temp">40°C</button>
+                        <button class="btn-sm temp">45°C</button>
+                        <button class="btn-sm temp">50°C</button>
+                        <button class="btn-sm temp">55°C</button>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>Мощность (ручной режим):</h4>
+                        <div class="button-row">
+                            <button class="btn-sm power">0%</button>
+                            <button class="btn-sm power">25%</button>
+                            <button class="btn-sm power">50%</button>
+                            <button class="btn-sm power">75%</button>
+                            <button class="btn-sm power">100%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Графики -->
+        <div class="card" style="margin: 20px;">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> График температур</h3>
+                <button class="btn-sm" id="toggleChart">
+                    <i class="fas fa-expand-alt"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <div class="footer-info">
+                <div class="update-info">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Обновлено: <span id="lastUpdate">--:--:--</span></span>
+                </div>
+                <div class="wifi-info" id="wifiInfo">
+                    <i class="fas fa-wifi"></i>
+                    <span>WiFi подключен</span>
+                </div>
+            </div>
+            <div class="footer-actions">
+                <button class="btn-sm" id="btnReset">
+                    <i class="fas fa-redo"></i> Сброс ошибок
+                </button>
+                <button class="btn-sm" id="btnRefresh">
+                    <i class="fas fa-sync"></i> Обновить
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chart.js с CDN fallback для автономной работы -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"
+            onerror="console.warn('Chart.js CDN недоступен, графики отключены'); window.chartJSAvailable=false;">
+    </script>
+    <script>
+        // Проверяем доступность Chart.js
+        if (typeof Chart === 'undefined') {
+            window.chartJSAvailable = false;
+            console.warn('Chart.js не загрулся — графики будут отключены');
+        } else {
+            window.chartJSAvailable = true;
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

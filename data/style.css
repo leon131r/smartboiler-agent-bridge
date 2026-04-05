@@ -1,0 +1,649 @@
+/* ===== ОСНОВНЫЕ СТИЛИ ===== */
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --info: #17a2b8;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --border: #dee2e6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--dark);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+/* ===== ЗАГОЛОВОК ===== */
+/* Иконка Wi-Fi с уровнем сигнала */
+.wifi-strong { color: #4CAF50; }
+.wifi-medium { color: #FF9800; }
+.wifi-weak { color: #F44336; }
+
+/* Статус получения IP */
+#ipText {
+    font-family: monospace;
+    font-weight: 600;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 480px) {
+    #ipText {
+        font-size: 0.9em;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.header {
+    background: var(--primary);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title h1 {
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: right;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* ===== АВАРИЯ УРОВНЯ ВОДЫ ===== */
+.water-alert {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    padding: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    margin: 15px 20px;
+    animation: waterPulse 2s infinite;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+}
+
+@keyframes waterPulse {
+    0% { 
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+    }
+    50% { 
+        background: linear-gradient(135deg, #ff5252 0%, #ff3838 100%);
+        box-shadow: 0 0 20px 10px rgba(231, 76, 60, 0.4);
+    }
+    100% { 
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+    }
+}
+
+.water-alert i {
+    font-size: 24px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== ОСНОВНАЯ ИНФОРМАЦИЯ ===== */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: var(--light);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.card-header {
+    background: var(--primary);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* ===== ТЕМПЕРАТУРЫ ===== */
+.temp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.temp-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+}
+
+.temp-label {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.temp-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.temp-trend {
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+.trend-up {
+    color: var(--danger);
+}
+
+.trend-down {
+    color: var(--success);
+}
+
+/* ===== УПРАВЛЕНИЕ ===== */
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.control-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.control-label {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.control-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 15px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ===== КНОПКИ ===== */
+.btn {
+    padding: 18px 25px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 140px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #219653 100%);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning) 0%, #d68910 100%);
+    color: white;
+}
+
+.btn-sm {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    color: var(--dark);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: 2px solid var(--border);
+    min-width: 60px;
+}
+
+.btn-sm:hover {
+    background: var(--light);
+    transform: translateY(-2px);
+}
+
+.temp, .power {
+    min-width: 70px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ===== ПОЛЗУНОК МОЩНОСТИ ===== */
+.power-slider {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--success), var(--warning), var(--danger));
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid var(--secondary);
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* ===== СТАТУС СИСТЕМЫ ===== */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.status-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.status-text {
+    font-size: 16px;
+    color: var(--dark);
+    font-weight: 500;
+}
+
+.status-text span {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* ===== БЫСТРЫЕ КОМАНДЫ ===== */
+.quick-commands {
+    margin: 20px;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.command-group {
+    margin-bottom: 25px;
+}
+
+.command-group:last-child {
+    margin-bottom: 0;
+}
+
+.command-group h4 {
+    font-size: 18px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.button-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* ===== ГРАФИК ===== */
+.chart-container {
+    height: 350px;
+    width: 100%;
+    margin-top: 20px;
+    transition: height 0.3s ease;
+}
+
+/* ===== ФУТЕР ===== */
+.footer {
+    background: var(--light);
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.update-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.wifi-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 20px;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ===== БЭЙДЖИ ===== */
+.mode-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== СТАТУС ПОДКЛЮЧЕНИЯ ===== */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.online {
+    background: var(--success);
+    animation: pulse 2s infinite;
+}
+
+.status-dot.offline {
+    background: var(--danger);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ===== АВАРИЙНЫЕ СТИЛИ ===== */
+.btn-emergency {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+    color: white !important;
+    animation: waterPulse 1.5s infinite !important;
+    font-weight: bold !important;
+    border: none !important;
+}
+
+.btn-emergency:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 25px rgba(231, 76, 60, 0.5) !important;
+}
+
+/* Уведомление о перегреве */
+.overheat-alert {
+    background: linear-gradient(135deg, #ff9a00 0%, #ff6b00 100%);
+    color: white;
+    padding: 15px 20px;
+    margin: 10px 20px;
+    border-radius: 10px;
+    animation: shake 0.5s infinite, waterPulse 1.5s infinite;
+    box-shadow: 0 5px 20px rgba(255, 107, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.overheat-alert i {
+    font-size: 28px;
+    animation: blink 0.7s infinite;
+}
+
+.alert-text {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.alert-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.alert-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-btn:hover {
+    background: white;
+    color: #ff6b00;
+    transform: scale(1.05);
+}
+
+/* ===== ПЛАВНЫЕ ПЕРЕХОДЫ (убираем мигание) ===== */
+#relayIcon, #relayState, #consumption {
+    transition: all 0.3s ease;
+}
+
+.temp-value, .control-value {
+    transition: color 0.3s ease;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 1024px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .temp-grid,
+    .control-grid,
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        border-radius: 15px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .header-info {
+        text-align: center;
+    }
+    
+    .temp-grid,
+    .control-grid,
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .button-row {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .footer-info {
+        flex-direction: column;
+    }
+}

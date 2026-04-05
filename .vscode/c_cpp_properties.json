@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "ESP32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "~/.arduino15/packages/esp32/**"
+            ],
+            "defines": [
+                "ARDUINO=10819",
+                "ESP32"
+            ],
+            "compilerPath": "/usr/bin/avr-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
