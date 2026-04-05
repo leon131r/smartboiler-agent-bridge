@@ -101,14 +101,32 @@ void detectCity();
 void fetchWeather();
 
 /**
- * Подключение к WiFi — ЖЁСТКИЙ STA режим, без AP
+ * Подключение к WiFi с fallback на AP Mode
+ * 1. Пробуем STA 20 сек
+ * 2. Если не удалось — поднимаем AP с web-сервером настройки
  */
 void connectWiFi() {
-    Serial.printf("[WiFi] Подключение к '%s'...\n", WIFI_SSID);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    // Пробуем загрузить сохранённые креды из Preferences
+    preferences.begin("wifi", true);
+    String savedSsid = preferences.getString("ssid", "");
+    String savedPass = preferences.getString("pass", "");
+    preferences.end();
+
+    const char* ssid = WIFI_SSID;
+    const char* pass = WIFI_PASS;
+
+    if (savedSsid.length() > 0) {
+        ssid = savedSsid.c_str();
+        pass = savedPass.c_str();
+        Serial.printf("[WiFi] Используем сохранённые креды: '%s'\n", ssid);
+    }
+
+    Serial.printf("[WiFi] Подключение к '%s'...\n", ssid);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, pass);
 
     uint8_t attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 40) {
+    while (WiFi.status() != WL_CONNECTED && attempts < 40) {  // 40 * 500мс = 20 сек
         delay(500);
         Serial.print(".");
         attempts++;
@@ -117,13 +135,23 @@ void connectWiFi() {
     if (WiFi.status() == WL_CONNECTED) {
         Serial.printf("\n[WiFi] ✅ Подключена! IP: %s | RSSI: %d dBm\n",
                       WiFi.localIP().toString().c_str(), WiFi.RSSI());
-        // Определяем город
         detectCity();
         return;
     }
 
-    Serial.printf("\n[WiFi] ❌ Не удалось подключиться к %s\n", WIFI_SSID);
-    Serial.println("[WiFi] Продолжаю работу без сети...");
+    // Fallback: AP Mode
+    Serial.printf("\n[WiFi] ❌ Не удалось подключиться к '%s'\n", ssid);
+    Serial.println("[WiFi] 📡 Поднимаю AP Mode (WiFi-Clock-Setup)...");
+
+    WiFi.mode(WIFI_AP);
+    bool apStarted = WiFi.softAP("WiFi-Clock-Setup", "12345678");
+    if (apStarted) {
+        Serial.printf("[WiFi] ✅ AP запущен! IP: %s\n", WiFi.softAPIP().toString().c_str());
+        oledWorking = true;  // Разрешаем отрисовку даже если OLED не init
+        setupWebServer();    // Веб-сервер для настройки WiFi
+    } else {
+        Serial.println("[WiFi] ❌ Ошибка запуска AP!");
+    }
 }
 
 /**
@@ -192,7 +220,7 @@ void detectCity() {
         Serial.printf("[Geo] RAW ответ (ipwhois): %s\n", payload.c_str());
 
         // ipwhois.app возвращает большой JSON — нужен больший буфер
-        DynamicJsonDocument doc(4096);
+        DynamicJsonDocument doc(2048);  // Уменьшено с 4096 для экономии RAM на ESP32-C3
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {
@@ -448,7 +476,10 @@ void displayUpdate() {
             }
         } else if (currentTime.length() > 0) {
             // Экран часов
-            u8g2.clearBuffer();  // Чистим перед отрисовкой
+            // В page mode clearBuffer() не работает! Рисуем чёрный фон:
+            u8g2.setDrawColor(0);
+            u8g2.drawBox(0, 0, 128, 64);
+            u8g2.setDrawColor(1);
 
             // WiFi SSID (вверху, по центру)
             if (WiFi.status() == WL_CONNECTED) {
@@ -470,6 +501,11 @@ void displayUpdate() {
             u8g2.drawStr((128 - dw) / 2, 62, currentDate.c_str());
         } else {
             // NTP ещё не получен — показываем статус
+            // Очистка в page mode
+            u8g2.setDrawColor(0);
+            u8g2.drawBox(0, 0, 128, 64);
+            u8g2.setDrawColor(1);
+
             u8g2.setFont(u8g2_font_6x13_t_cyrillic);
             if (WiFi.status() == WL_CONNECTED) {
                 u8g2.drawStr(5, 15, "NTP sync...");
@@ -605,8 +641,7 @@ void setup() {
     Serial.println("\n[Setup] --- NTP ---");
     timeClient.begin();
 
-    // Веб-сервер — ОТКЛЮЧЁН для отладки
-    // setupWebServer();
+    // Веб-сервер запускается автоматически в connectWiFi() при AP Mode
 
     Serial.println("\n======================================");
     Serial.println("  ✅ Система готова!");
